@@ -1,0 +1,5 @@
+$env:VCPKG_ROOT="C:\vcpkg"
+# $env:ODB_ROOT="C:\odb-2.5.0-msvc\libodb-2.5.0-x86_64-windows10-msvc17.10"
+# $env:ODB_ROOT_MAIN="C:\odb-2.5.0\bin"
+# $env:ODB_PGSQL_ROOT="C:\odb-2.5.0-msvc\libodb-pgsql-2.5.0-x86_64-windows10-msvc17.10"
+$env:PATH="$env:VCPKG_ROOT;$env:ODB_ROOT\bin;$env:ODB_ROOT_MAIN;$env:ODB_PGSQL_ROOT\bin;$env:PATH"

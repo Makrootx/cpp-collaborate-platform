@@ -1,0 +1,9 @@
+{
+    "name": "cpp-collaborate-platform",
+    "version": "1.0.0",
+    "dependencies": [
+        "crow",
+        "libpq",
+        "libpqxx"
+    ]
+}
