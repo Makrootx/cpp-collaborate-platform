@@ -1,6 +1,8 @@
 #include "shared/adapters/Logger.hpp"
 
+#include <chrono>
 #include <cstdlib>
+#include <filesystem>
 #include <memory>
 #include <string>
 #include <vector>
@@ -10,6 +12,7 @@
 #include <spdlog/sinks/rotating_file_sink.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <spdlog/spdlog.h>
+#include "shared/helpers/EnvProvider.hpp"
 
 namespace
 {
@@ -51,11 +54,17 @@ namespace Logger
 
         sinks.push_back(std::make_shared<spdlog::sinks::stdout_color_sink_mt>());
 
-        if (const char *log_file = std::getenv("LOG_FILE");
-            log_file != nullptr && log_file[0] != '\0')
+        const std::string log_file = EnvProvider::get("LOG_FILE");
+        if (!log_file.empty())
         {
             try
             {
+                const std::filesystem::path log_path(log_file);
+                if (log_path.has_parent_path())
+                {
+                    std::filesystem::create_directories(log_path.parent_path());
+                }
+
                 sinks.push_back(
                     std::make_shared<spdlog::sinks::rotating_file_sink_mt>(
                         log_file,
@@ -67,7 +76,7 @@ namespace Logger
                 fprintf(stderr,
                         "[Logger] File sink failed for '%s': %s"
                         " — falling back to console only\n",
-                        log_file, e.what());
+                        log_file.c_str(), e.what());
             }
         }
 
@@ -77,13 +86,16 @@ namespace Logger
             spdlog::thread_pool(),
             spdlog::async_overflow_policy::block);
 
-        const auto level = parse_log_level(std::getenv("LOG_LEVEL"));
+        const std::string log_level = EnvProvider::get("LOG_LEVEL");
+        const auto level = parse_log_level(log_level.c_str());
         logger->set_level(level);
 
-        logger->flush_on(spdlog::level::warn);
+        // Keep async mode, but flush aggressively to reduce data loss on abrupt termination.
+        logger->flush_on(spdlog::level::trace);
 
         spdlog::set_default_logger(logger);
         spdlog::set_pattern("[%Y-%m-%d %H:%M:%S.%e] [%^%l%$] [tid %t] %v");
+        spdlog::flush_every(std::chrono::seconds(1));
 
         spdlog::info("Logger initialized — level={} async=true",
                      spdlog::level::to_string_view(level));
@@ -92,6 +104,8 @@ namespace Logger
     void shutdown()
     {
         spdlog::info("Logger shutting down");
+        spdlog::apply_all([](const std::shared_ptr<spdlog::logger> &l)
+                          { l->flush(); });
         spdlog::shutdown();
     }
 
