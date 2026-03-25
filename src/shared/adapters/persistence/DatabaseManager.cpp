@@ -5,10 +5,6 @@
 #include <memory>
 #include <string>
 
-#ifdef _WIN32
-#define setenv(name, value, overwrite) _putenv_s(name, value)
-#endif
-#include <dotenv/dotenv.hpp>
 #include <spdlog/spdlog.h>
 #include <odb/pgsql/connection-factory.hxx>
 
