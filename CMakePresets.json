@@ -19,7 +19,7 @@
         {
             "name": "dev",
             "configurePreset": "dev",
-            "configuration": "Dev"
+            "configuration": "Release"
         }
     ]
 }

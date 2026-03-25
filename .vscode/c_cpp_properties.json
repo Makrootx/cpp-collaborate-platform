@@ -1,0 +1,25 @@
+{
+  "configurations": [
+    {
+      "name": "CMake",
+      "configurationProvider": "ms-vscode.cmake-tools",
+      "includePath": [
+        "${workspaceFolder}/src",
+        "${workspaceFolder}/build_dev/vcpkg_installed/x64-windows/include"
+      ],
+      "compilerPath": "D:/Visual Studio/Visual Studio Community 2022/VC/Tools/MSVC/14.44.35207/bin/Hostx64/x64/cl.exe",
+      "cStandard": "${default}",
+      "cppStandard": "c++20",
+      "intelliSenseMode": "windows-msvc-x64",
+      "compilerArgs": [],
+      "defines": [
+        "ODB_CXX11",
+        "ODB_CXX11_NULLPTR",
+        "_HAS_AUTO_PTR=1",
+        "_HAS_AUTO_PTR_ETC=1",
+        "_HAS_DEPRECATED_FEATURES=1"
+      ]
+    }
+  ],
+  "version": 4
+}

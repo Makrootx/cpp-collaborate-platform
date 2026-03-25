@@ -1,0 +1,18 @@
+{
+  "configurations": [
+    {
+      "name": "windows-msvc-x64",
+      "includePath": [
+        "${workspaceFolder}/**",
+        "C:/vcpkg/installed/x64-windows/include"
+      ],
+      "compilerPath": "C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.*/bin/Hostx64/x64/cl.exe",
+      "cStandard": "${default}",
+      "cppStandard": "c++20",
+      "intelliSenseMode": "windows-msvc-x64",
+      "compilerArgs": [],
+      "defines": []
+    }
+  ],
+  "version": 4
+}

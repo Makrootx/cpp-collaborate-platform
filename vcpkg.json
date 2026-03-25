@@ -4,6 +4,13 @@
     "dependencies": [
         "crow",
         "libpq",
-        "libpqxx"
+        "libpqxx",
+        "libodb",
+        "libodb-pgsql",
+        "argon2",
+        "jwt-cpp",
+        "picojson",
+        "ayush272002-dotenv",
+        "spdlog"
     ]
 }

@@ -44,6 +44,10 @@ build/
 Build/
 build-*/
 
+build_dev/
+.deps/
+.env
+
 # CMake generated files
 CMakeFiles/
 CMakeCache.txt
