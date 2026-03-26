@@ -13,6 +13,7 @@ const std::map<std::string, std::string> EnvProvider::env_default_values = {
     {Env::DB_POOL_MAX, "20"},
     {Env::DB_POOL_MIN, "5"},
     {Env::JWT_KEY, "dev-jwt-secret"},
+    {Env::JWT_TOKEN_EXPIRY, "24"},
     {Env::LOG_LEVEL, "info"},
     {Env::LOG_FILE, "logs/app.log"},
 };
