@@ -11,6 +11,6 @@ template <typename Domain, typename Odb>
 class IOdbMappableQuery
 {
 public:
-    static Domain to_domain_query(const Odb &odb, const std::vector<std::string> &columns);
+    static Domain to_domain_query(Odb &odb, const std::vector<std::string> &columns);
     static Odb to_odb_query(const Domain &domain, const std::vector<std::string> &columns);
 };

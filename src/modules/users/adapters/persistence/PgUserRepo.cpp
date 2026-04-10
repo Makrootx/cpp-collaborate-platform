@@ -2,7 +2,7 @@
 #include "modules/users/adapters/persistence/UserOdb-odb.hxx"
 
 template <typename Y>
-    requires OdbMappable<User, Y> && OdbBase<Y>
+    requires OdbMappable<User, Y> && OdbBase<Y> && OdbMappableQuery<User, Y>
 std::vector<User> PgUserRepo<Y>::find_by_email(const std::string &email)
 {
     odb::transaction t(this->db_->begin());

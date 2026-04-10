@@ -24,7 +24,7 @@ concept OdbBase = requires(Odb odb) {
  * through AOdbMapper.
  */
 template <typename Domain, typename Odb>
-    requires OdbMappable<Domain, Odb> && OdbBase<Odb>
+    requires OdbMappable<Domain, Odb> && OdbBase<Odb> && OdbMappableQuery<Domain, Odb>
 class PgBaseRepo : public virtual IBaseRepo<Domain>
 {
 protected:
@@ -41,31 +41,17 @@ protected:
     /**
      * @brief Convert ODB object to domain object with optional partial hydration.
      */
-    Domain to_domain_query(const Odb &odb, const std::vector<std::string> &columns)
+    Domain to_domain_query(Odb &odb, const std::vector<std::string> &columns)
     {
-        if constexpr (OdbMappableQuery<Domain, Odb>)
-        {
-            return AOdbMapper<Domain, Odb>::to_domain_query(odb, columns);
-        }
-        else
-        {
-            return AOdbMapper<Domain, Odb>::to_domain(odb);
-        }
-    };
-
-    /**
-     * @brief Convert domain object to ODB object with optional query-aware mapping.
-     */
-    Odb to_odb_query(const Domain &domain, const std::vector<std::string> &columns)
-    {
-        if constexpr (OdbMappableQuery<Domain, Odb>)
-        {
-            return AOdbMapper<Domain, Odb>::to_odb_query(domain, columns);
-        }
-        else
-        {
-            return AOdbMapper<Domain, Odb>::to_odb(domain);
-        }
+        return AOdbMapper<Domain, Odb>::to_domain_query(odb, columns);
+        // if constexpr (OdbMappableQuery<Domain, Odb>)
+        // {
+        //     return AOdbMapper<Domain, Odb>::to_domain_query(odb, columns);
+        // }
+        // else
+        // {
+        //     return AOdbMapper<Domain, Odb>::to_domain(odb);
+        // }
     };
 
 public:

@@ -14,9 +14,8 @@ concept OdbMappable = requires(T t, Y y) {
 
 /** @brief True when Y provides query-aware static conversion for T. */
 template <typename T, typename Y>
-concept OdbMappableQuery = requires(T t, Y y) {
-    { Y::to_domain_query(y, std::vector<std::string>{}) } -> std::convertible_to<T>;
-    { Y::to_odb_query(t, std::vector<std::string>{}) } -> std::convertible_to<Y>;
+concept OdbMappableQuery = requires(Y y, const std::vector<std::string> &columns) {
+    { y.populate(columns) };
 };
 
 /**
@@ -26,15 +25,14 @@ concept OdbMappableQuery = requires(T t, Y y) {
  * implementations.
  */
 template <typename T, typename Y>
-    requires OdbMappable<T, Y>
+    requires OdbMappable<T, Y> && OdbMappableQuery<T, Y>
 class AOdbMapper
 {
 public:
     static T to_domain(const Y &odb);
     static Y to_odb(const T &domain);
 
-    static T to_domain_query(const Y &odb, const std::vector<std::string> &columns);
-    static Y to_odb_query(const T &domain, const std::vector<std::string> &columns);
+    static T to_domain_query(Y &odb, const std::vector<std::string> &columns);
 };
 
 #include "shared/ports/AOdbMapper.tpp"

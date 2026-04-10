@@ -7,7 +7,7 @@
 
 /** @brief PostgreSQL repository implementation for User aggregate. */
 template <typename Y>
-    requires OdbMappable<User, Y> && OdbBase<Y>
+    requires OdbMappable<User, Y> && OdbBase<Y> && OdbMappableQuery<User, Y>
 class PgUserRepo : public IUserRepo, public PgBaseRepo<User, Y>
 {
 public:

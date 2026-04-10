@@ -3,7 +3,7 @@
 #include <typeinfo>
 
 template <typename Domain, typename Odb>
-    requires OdbMappable<Domain, Odb> && OdbBase<Odb>
+    requires OdbMappable<Domain, Odb> && OdbBase<Odb> && OdbMappableQuery<Domain, Odb>
 long int PgBaseRepo<Domain, Odb>::create(const Domain &domain)
 {
     Odb odb = to_odb(domain);
@@ -14,7 +14,7 @@ long int PgBaseRepo<Domain, Odb>::create(const Domain &domain)
 }
 
 template <typename Domain, typename Odb>
-    requires OdbMappable<Domain, Odb> && OdbBase<Odb>
+    requires OdbMappable<Domain, Odb> && OdbBase<Odb> && OdbMappableQuery<Domain, Odb>
 std::optional<Domain> PgBaseRepo<Domain, Odb>::find_by_id(long int id)
 {
     try
@@ -39,7 +39,7 @@ std::optional<Domain> PgBaseRepo<Domain, Odb>::find_by_id(long int id)
 }
 
 template <typename Domain, typename Odb>
-    requires OdbMappable<Domain, Odb> && OdbBase<Odb>
+    requires OdbMappable<Domain, Odb> && OdbBase<Odb> && OdbMappableQuery<Domain, Odb>
 std::optional<Domain> PgBaseRepo<Domain, Odb>::find_by_id_query(long int id, const std::vector<std::string> &columns)
 {
     try
@@ -64,7 +64,7 @@ std::optional<Domain> PgBaseRepo<Domain, Odb>::find_by_id_query(long int id, con
 }
 
 template <typename Domain, typename Odb>
-    requires OdbMappable<Domain, Odb> && OdbBase<Odb>
+    requires OdbMappable<Domain, Odb> && OdbBase<Odb> && OdbMappableQuery<Domain, Odb>
 std::vector<Domain> PgBaseRepo<Domain, Odb>::get_all()
 {
     odb::transaction t(db_->begin());
@@ -79,7 +79,7 @@ std::vector<Domain> PgBaseRepo<Domain, Odb>::get_all()
 }
 
 template <typename Domain, typename Odb>
-    requires OdbMappable<Domain, Odb> && OdbBase<Odb>
+    requires OdbMappable<Domain, Odb> && OdbBase<Odb> && OdbMappableQuery<Domain, Odb>
 void PgBaseRepo<Domain, Odb>::update(const Domain &domain)
 {
     Odb odb = to_odb(domain);
@@ -89,7 +89,7 @@ void PgBaseRepo<Domain, Odb>::update(const Domain &domain)
 }
 
 template <typename Domain, typename Odb>
-    requires OdbMappable<Domain, Odb> && OdbBase<Odb>
+    requires OdbMappable<Domain, Odb> && OdbBase<Odb> && OdbMappableQuery<Domain, Odb>
 void PgBaseRepo<Domain, Odb>::delete_by_id(long int id)
 {
     odb::transaction t(db_->begin());

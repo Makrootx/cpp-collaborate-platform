@@ -1,6 +1,19 @@
 #pragma once
 
 #include <odb/core.hxx>
+#include <odb/lazy-ptr.hxx>
+#include <concepts>
+#include <functional>
+#include <map>
+#include <string>
+#include <string_view>
+#include <utility>
+#include <vector>
+
+template <typename lazy_ptr>
+concept Loadable = requires(lazy_ptr ptr) {
+    { ptr.load() };
+};
 
 #pragma db object abstract
 /**
@@ -11,6 +24,9 @@
  */
 class BaseOdb
 {
+private:
+    std::vector<std::string> included_fields_ = {};
+
 protected:
     friend class odb::access;
 
@@ -18,7 +34,31 @@ protected:
     unsigned long id_ = 0;
 
 public:
+    const std::vector<std::string> &get_included_fields() const { return included_fields_; }
+    const bool is_field_included(const std::string &field) const;
+
     BaseOdb() = default;
     explicit BaseOdb(unsigned long id) : id_(id) {}
+    virtual ~BaseOdb() = default;
     unsigned long id_value() const { return id_; }
+
+    using Loader = std::function<void(const std::vector<std::string> &nested_columns)>;
+    virtual const std::map<std::string, std::function<std::vector<Loader>()>> get_loaders_map() const;
+    static const std::map<std::string, std::vector<std::string>> separate_root_and_nested(const std::vector<std::string> &columns);
+    void populate(const std::vector<std::string> &columns);
+
+    template <typename LazyPtr>
+        requires Loadable<LazyPtr>
+    static const std::function<void(const std::vector<std::string> &)> get_loader_callback(LazyPtr *ptr_ref);
+
+    /** @brief Convert a vector of lazy pointers into generic loader callbacks. */
+    template <typename LazyPtr>
+        requires Loadable<LazyPtr>
+    static std::vector<Loader> to_loaders(const std::vector<LazyPtr> &lazy_ptrs);
+
+    template <typename LazyPtr>
+        requires Loadable<LazyPtr>
+    static std::vector<Loader> to_loaders(const LazyPtr &lazy_ptr);
 };
+
+#include "shared/adapters/persistence/odb/BaseOdb.tpp"
