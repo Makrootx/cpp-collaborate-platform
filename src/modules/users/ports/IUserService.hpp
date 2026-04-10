@@ -2,6 +2,7 @@
 
 #include <string>
 #include <optional>
+#include <vector>
 #include "modules/users/adapters/dto/UserDto.hpp"
 
 /** @brief Application service contract for user-related use cases. */
@@ -16,4 +17,8 @@ public:
     virtual std::optional<UserResultDto> get_user_by_id(unsigned long id) = 0;
     /** @brief Authenticates user credentials and returns JWT when successful. */
     virtual std::optional<std::string> authenticate_user(const UserAuthenticateDto &dto) = 0;
+
+    virtual std::vector<UserResultDto> get_all_users() = 0;
+
+    virtual void update_user(const UserUpdateDto &dto) = 0;
 };

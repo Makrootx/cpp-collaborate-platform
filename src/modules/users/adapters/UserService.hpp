@@ -21,4 +21,8 @@ public:
     std::optional<UserResultDto> get_user_by_id(unsigned long id) override;
     /** @brief Authenticates credentials and returns JWT when successful. */
     std::optional<std::string> authenticate_user(const UserAuthenticateDto &dto) override;
+
+    std::vector<UserResultDto> get_all_users() override;
+
+    void update_user(const UserUpdateDto &dto) override;
 };
