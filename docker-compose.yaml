@@ -1,0 +1,48 @@
+services:
+  backend-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: backend-app
+    environment:
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
+      DB_HOST: backend-db
+      DB_PORT: 5432
+      POSTGRES_PORT: 5432
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY}
+      LOG_LEVEL: ${LOG_LEVEL}
+      LOG_FILE: ${LOG_FILE}
+    ports:
+      - "8081:8080"
+    depends_on:
+      backend-db:
+        condition: service_healthy
+    networks:
+      - testapp-network
+  backend-db:
+    image: postgres:13
+
+    container_name: backend-db
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    ports:
+      - ${DB_PORT}:5432
+    volumes:
+      - testapp-volume:/var/lib/postgresql/data
+    networks:
+      - testapp-network
+networks:
+  testapp-network:
+    driver: bridge
+volumes:
+  testapp-volume:
