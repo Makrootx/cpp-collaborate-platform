@@ -32,7 +32,7 @@ public:
     static T to_domain(const Y &odb);
     static Y to_odb(const T &domain);
 
-    static T to_domain_query(Y &odb, const std::vector<std::string> &columns);
+    static T to_domain_query(const Y &odb, const std::vector<std::string> &columns);
 };
 
 #include "shared/ports/AOdbMapper.tpp"

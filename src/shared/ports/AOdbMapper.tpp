@@ -1,4 +1,4 @@
-#include "shared/ports/AOdbMapper.hpp"
+﻿#include "shared/ports/AOdbMapper.hpp"
 
 template <typename T, typename Y>
     requires OdbMappable<T, Y> && OdbMappableQuery<T, Y>
@@ -16,7 +16,7 @@ Y AOdbMapper<T, Y>::to_odb(const T &domain)
 
 template <typename T, typename Y>
     requires OdbMappable<T, Y> && OdbMappableQuery<T, Y>
-T AOdbMapper<T, Y>::to_domain_query(Y &odb, const std::vector<std::string> &columns)
+T AOdbMapper<T, Y>::to_domain_query(const Y &odb, const std::vector<std::string> &columns)
 {
     odb.populate(columns);
     return Y::to_domain(odb);
