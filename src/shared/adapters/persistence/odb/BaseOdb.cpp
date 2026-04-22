@@ -12,17 +12,15 @@ const std::map<std::string, std::function<std::vector<BaseOdb::Loader>()>> BaseO
 }
 
 void BaseOdb::populate(
-    const std::vector<std::string> &columns)
+    const std::vector<std::string> &columns) const
 {
-    included_fields_.clear();
-
     auto nested_columns_by_root = separate_root_and_nested(columns);
 
     auto populate_fields = get_loaders_map();
 
     for (const auto &[root, nested_columns] : nested_columns_by_root)
     {
-        included_fields_.push_back(root);
+        included_fields_.insert(root);
         const auto it = populate_fields.find(root);
         if (it == populate_fields.end())
         {

@@ -18,6 +18,7 @@ public:
     virtual std::optional<T> find_by_id(long int id) = 0;
     virtual std::optional<T> find_by_id_query(long int id, const std::vector<std::string> &columns) = 0;
     virtual std::vector<T> get_all() = 0;
+    virtual std::vector<T> get_all_query(const std::vector<std::string> &columns) = 0;
     virtual void update(const T &domain) = 0;
     virtual void delete_by_id(long int id) = 0;
 };

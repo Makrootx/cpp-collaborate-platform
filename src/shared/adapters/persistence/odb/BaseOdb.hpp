@@ -9,6 +9,7 @@
 #include <string_view>
 #include <utility>
 #include <vector>
+#include <unordered_set>
 
 template <typename lazy_ptr>
 concept Loadable = requires(lazy_ptr ptr) {
@@ -25,7 +26,8 @@ concept Loadable = requires(lazy_ptr ptr) {
 class BaseOdb
 {
 private:
-    std::vector<std::string> included_fields_ = {};
+#pragma db transient
+    mutable std::unordered_set<std::string> included_fields_ = {};
 
 protected:
     friend class odb::access;
@@ -34,7 +36,7 @@ protected:
     unsigned long id_ = 0;
 
 public:
-    const std::vector<std::string> &get_included_fields() const { return included_fields_; }
+    const std::unordered_set<std::string> &get_included_fields() const { return included_fields_; }
     const bool is_field_included(const std::string &field) const;
 
     BaseOdb() = default;
@@ -45,7 +47,7 @@ public:
     using Loader = std::function<void(const std::vector<std::string> &nested_columns)>;
     virtual const std::map<std::string, std::function<std::vector<Loader>()>> get_loaders_map() const;
     static const std::map<std::string, std::vector<std::string>> separate_root_and_nested(const std::vector<std::string> &columns);
-    void populate(const std::vector<std::string> &columns);
+    void populate(const std::vector<std::string> &columns) const;
 
     template <typename LazyPtr>
         requires Loadable<LazyPtr>
