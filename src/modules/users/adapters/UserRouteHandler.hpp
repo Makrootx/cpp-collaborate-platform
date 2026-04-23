@@ -1,6 +1,7 @@
 #pragma once
 #include "modules/users/ports/IUserService.hpp"
 #include "shared/adapters/JwtGuard.hpp"
+#include "shared/adapters/PermissionGuard.hpp"
 #include "shared/adapters/SpaceGuard.hpp"
 #include "crow.h"
 
@@ -17,5 +18,5 @@ public:
     }
 
     /** @brief Binds all user routes and middleware-aware handlers to app. */
-    void setup(crow::App<JwtMiddleware, SpaceMiddleware> &app);
+    void setup(crow::App<JwtMiddleware, SpaceMiddleware, PermissionMiddleware> &app);
 };

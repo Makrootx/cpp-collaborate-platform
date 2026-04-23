@@ -258,7 +258,7 @@ namespace odb
   }
 
   const char access::object_traits_impl< ::UserOdb, id_pgsql >::persist_statement[] =
-  "INSERT INTO \"users\" "
+  "INSERT INTO \"public\".\"users\" "
   "(\"id\", "
   "\"email\", "
   "\"password\") "
@@ -268,35 +268,35 @@ namespace odb
 
   const char access::object_traits_impl< ::UserOdb, id_pgsql >::find_statement[] =
   "SELECT "
-  "\"users\".\"id\", "
-  "\"users\".\"email\", "
-  "\"users\".\"password\" "
-  "FROM \"users\" "
-  "WHERE \"users\".\"id\"=$1";
+  "\"public\".\"users\".\"id\", "
+  "\"public\".\"users\".\"email\", "
+  "\"public\".\"users\".\"password\" "
+  "FROM \"public\".\"users\" "
+  "WHERE \"public\".\"users\".\"id\"=$1";
 
   const char access::object_traits_impl< ::UserOdb, id_pgsql >::update_statement[] =
-  "UPDATE \"users\" "
+  "UPDATE \"public\".\"users\" "
   "SET "
   "\"email\"=$1, "
   "\"password\"=$2 "
   "WHERE \"id\"=$3";
 
   const char access::object_traits_impl< ::UserOdb, id_pgsql >::erase_statement[] =
-  "DELETE FROM \"users\" "
+  "DELETE FROM \"public\".\"users\" "
   "WHERE \"id\"=$1";
 
   const char access::object_traits_impl< ::UserOdb, id_pgsql >::query_statement[] =
   "SELECT "
-  "\"users\".\"id\", "
-  "\"users\".\"email\", "
-  "\"users\".\"password\" "
-  "FROM \"users\"";
+  "\"public\".\"users\".\"id\", "
+  "\"public\".\"users\".\"email\", "
+  "\"public\".\"users\".\"password\" "
+  "FROM \"public\".\"users\"";
 
   const char access::object_traits_impl< ::UserOdb, id_pgsql >::erase_query_statement[] =
-  "DELETE FROM \"users\"";
+  "DELETE FROM \"public\".\"users\"";
 
   const char access::object_traits_impl< ::UserOdb, id_pgsql >::table_name[] =
-  "\"users\"";
+  "\"public\".\"users\"";
 
   void access::object_traits_impl< ::UserOdb, id_pgsql >::
   persist (database& db, object_type& obj)

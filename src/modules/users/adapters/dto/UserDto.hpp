@@ -71,8 +71,29 @@ public:
         return f;
     };
 
-    static UserResultDto from_domain(const User &user)
+    static UserResultDto from_domain(const IUserUse &user)
     {
         return UserResultDto{.id = user.get_id(), .email = user.get_email()};
+    }
+};
+
+struct UserResultSecureDto : public JsonDto<UserResultSecureDto>
+{
+public:
+    std::optional<long int> id;
+    std::optional<std::string> email;
+
+    static const std::vector<FieldDescriptor> &fields()
+    {
+        static const std::vector<FieldDescriptor> f = {
+            field_secured("id", &UserResultSecureDto::id),
+            field_secured("email", &UserResultSecureDto::email),
+        };
+        return f;
+    };
+
+    static UserResultSecureDto from_domain(const IUserSecureUse &user)
+    {
+        return UserResultSecureDto{.id = user.get_id(), .email = user.get_email()};
     }
 };
