@@ -12,6 +12,8 @@ const std::map<std::string, std::string> EnvProvider::env_default_values = {
     {Env::DB_PORT, "5432"},
     {Env::DB_POOL_MAX, "20"},
     {Env::DB_POOL_MIN, "5"},
+    {Env::HTTP_HOST, "0.0.0.0"},
+    {Env::HTTP_PORT, "8081"},
     {Env::JWT_KEY, "dev-jwt-secret"},
     {Env::JWT_TOKEN_EXPIRY, "24"},
     {Env::LOG_LEVEL, "info"},

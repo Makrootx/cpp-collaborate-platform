@@ -5,6 +5,7 @@
 #include <string>
 #include <map>
 
+/// @brief Provides access to application configuration resolved from environment variables with fallback defaults.
 class EnvProvider
 {
 protected:
@@ -14,6 +15,8 @@ protected:
 public:
     EnvProvider() = delete;
 
+    /// @brief Loads all known environment variables, applying defaults when a variable is absent.
     static void init();
+    /// @brief Returns the value of a named environment variable, or an empty string if not found.
     static std::string get(const std::string &key);
 };
