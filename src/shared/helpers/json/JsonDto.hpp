@@ -1,7 +1,5 @@
 #pragma once
 
-#pragma once
-
 #include "crow.h"
 
 #include <concepts>
@@ -69,13 +67,25 @@ protected:
     static FieldBuilder field(const char *key, T Dto::*member);
 
     template <HasJsonTypeHelper T>
+    static FieldBuilder field_secured(const char *key, std::optional<T> Dto::*member);
+
+    template <HasJsonTypeHelper T>
     static FieldBuilder optional_field(const char *key, std::optional<T> Dto::*member);
+
+    template <HasJsonTypeHelper T>
+    static FieldBuilder optional_field_secured(const char *key, std::optional<std::optional<T>> Dto::*member);
 
     template <NestedDto Nested>
     static FieldBuilder nested_field(const char *key, Nested Dto::*member);
 
     template <NestedDto Nested>
+    static FieldBuilder nested_field_secured(const char *key, std::optional<Nested> Dto::*member);
+
+    template <NestedDto Nested>
     static FieldBuilder optional_nested_field(const char *key, std::optional<Nested> Dto::*member);
+
+    template <NestedDto Nested>
+    static FieldBuilder optional_nested_field_secured(const char *key, std::optional<std::optional<Nested>> Dto::*member);
 };
 
 #include "JsonDto.tpp"
