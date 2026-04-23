@@ -6,6 +6,7 @@
 
 #include "shared/adapters/automation_core/AutomationParseUtils.hpp"
 
+/// @brief Represents an automation rule value that is either a literal, the current time, null, or a field copy.
 struct AutomationValue : public JsonDto<AutomationValue>
 {
     AutomationValueKind kind;
@@ -22,6 +23,7 @@ struct AutomationValue : public JsonDto<AutomationValue>
     }
 };
 
+/// @brief A single field-level condition comparing a domain attribute against a value using a comparison operator.
 struct ConditionRule : public JsonDto<ConditionRule>
 {
     std::string field_name;
@@ -39,6 +41,7 @@ struct ConditionRule : public JsonDto<ConditionRule>
     }
 };
 
+/// @brief A logical group of ConditionRule instances combined with AND/OR, with optional nested sub-groups.
 struct ConditionGroup : public JsonDto<ConditionGroup>
 {
     std::string operator_;
@@ -56,6 +59,7 @@ struct ConditionGroup : public JsonDto<ConditionGroup>
     }
 };
 
+/// @brief Describes an action to execute when an automation fires: which field to modify and how.
 struct AutomationAction : public JsonDto<AutomationAction>
 {
     AutomationActionType type;
@@ -73,6 +77,7 @@ struct AutomationAction : public JsonDto<AutomationAction>
     }
 };
 
+/// @brief Defines the event, timing, entity, and optional attribute that activates an automation rule.
 struct AutomationTrigger : public JsonDto<AutomationTrigger>
 {
     AutomationEvent event;
@@ -92,6 +97,7 @@ struct AutomationTrigger : public JsonDto<AutomationTrigger>
     }
 };
 
+/// @brief A complete automation rule with a unique id, trigger, optional condition, and list of actions.
 struct Automation : public JsonDto<Automation>
 {
     std::string id;
@@ -113,6 +119,7 @@ struct Automation : public JsonDto<Automation>
     }
 };
 
+/// @brief Top-level container for a space's automation rule set, deserialised from JSON configuration.
 struct AutomationConfig : public JsonDto<AutomationConfig>
 {
     std::vector<Automation> automations = {};

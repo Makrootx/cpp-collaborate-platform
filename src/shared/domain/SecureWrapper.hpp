@@ -8,6 +8,7 @@
 #include "shared/adapters/permission_core/PermissionUtils.hpp"
 #include "shared/domain/BaseWrapper.hpp"
 
+/// @brief Access-control policy that checks AttributePermission before granting method invocation.
 struct SecurePolicy
 {
     template <typename Fn>
@@ -17,6 +18,7 @@ struct SecurePolicy
     static void after(Fn);
 };
 
+/// @brief Wrapper that gates each field access through a permission policy, returning nullopt or false when access is denied.
 template <typename UseType, typename Domain = domain_t<UseType>, typename Policy = SecurePolicy>
 class SecureWrapper : public BaseWrapper<UseType, Domain>
 {
@@ -39,9 +41,11 @@ public:
     }
 
 protected:
+    /// @brief Checks read permission then delegates to the wrapped method; returns nullopt on denied access.
     template <typename ReturnType, typename... Args>
     std::optional<std::remove_cvref_t<ReturnType>> secure_get(ReturnType (UseType::*method)(Args...) const, PermissionFactor perm_factor, Args... args) const;
 
+    /// @brief Checks write permission then delegates to the wrapped method; returns false on denied access.
     template <typename ReturnType, typename... Args>
     bool secure_set(ReturnType (UseType::*method)(Args...), PermissionFactor perm_factor, Args... args);
 };

@@ -11,6 +11,7 @@
 #include <vector>
 #include <unordered_set>
 
+/// @brief Satisfied when lazy_ptr provides a load() member for deferred ODB relation loading.
 template <typename lazy_ptr>
 concept Loadable = requires(lazy_ptr ptr) {
     { ptr.load() };
@@ -37,6 +38,7 @@ protected:
 
 public:
     const std::unordered_set<std::string> &get_included_fields() const { return included_fields_; }
+    /// @brief Returns true when the given field name was included in the last populate() call.
     const bool is_field_included(const std::string &field) const;
 
     BaseOdb() = default;
@@ -45,10 +47,14 @@ public:
     unsigned long id_value() const { return id_; }
 
     using Loader = std::function<void(const std::vector<std::string> &nested_columns)>;
+    /// @brief Returns a map of relation name to loader factory functions; override in derived classes to register lazy-load callbacks.
     virtual const std::map<std::string, std::function<std::vector<Loader>()>> get_loaders_map() const;
+    /// @brief Splits a flat column list into a map of root key to nested columns by the first '.' separator.
     static const std::map<std::string, std::vector<std::string>> separate_root_and_nested(const std::vector<std::string> &columns);
+    /// @brief Loads relations for the requested columns using the registered loader callbacks.
     void populate(const std::vector<std::string> &columns) const;
 
+    /// @brief Returns a loader callback that calls load() on the given lazy pointer and forwards nested columns.
     template <typename LazyPtr>
         requires Loadable<LazyPtr>
     static const std::function<void(const std::vector<std::string> &)> get_loader_callback(LazyPtr *ptr_ref);

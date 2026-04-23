@@ -11,6 +11,7 @@
 #include "shared/adapters/automation_core/AutomationRuntimeStructs.hpp"
 #include "shared/adapters/automation_core/AutomationService.hpp"
 
+/// @brief No-op automation policy used as default before/after hook.
 struct DefaultPolicy
 {
     template <typename Fn>
@@ -24,6 +25,7 @@ struct DefaultPolicy
     }
 };
 
+/// @brief Wrapper that records domain actions on each method call and dispatches them to AutomationService on flush.
 template <typename UseType, typename Domain = domain_t<UseType>, typename Policy = DefaultPolicy>
 class AutomativeWrapper : public BaseWrapper<UseType, Domain>, public IAutomatable
 {
@@ -42,6 +44,7 @@ public:
     {
     }
 
+    /// @brief Sends all accumulated domain actions to AutomationService and clears the internal action queue.
     void flush_domain_actions();
 
 protected:
@@ -54,11 +57,13 @@ protected:
         return before_snapshot_;
     }
 
+    /// @brief Constructs a READ DomainAction for the given attribute name.
     DomainAction read_trigger(std::string attribute) const
     {
         return DomainAction{.event = AutomationEvent::READ, .attribute = std::move(attribute)};
     }
 
+    /// @brief Constructs an UPDATE DomainAction for the given attribute name.
     DomainAction update_trigger(std::string attribute) const
     {
         return DomainAction{.event = AutomationEvent::UPDATE, .attribute = std::move(attribute)};

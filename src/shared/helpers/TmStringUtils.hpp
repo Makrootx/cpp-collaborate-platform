@@ -5,8 +5,10 @@
 #include <sstream>
 #include <string>
 
+/// @brief Utilities for converting between std::tm and formatted string representations.
 namespace TmStringUtils
 {
+    /// @brief Formats a std::tm value as a string using the given strftime format.
     inline std::string to_string(const std::tm &time, const char *format = "%Y-%m-%d %H:%M:%S")
     {
         std::ostringstream oss;
@@ -14,6 +16,7 @@ namespace TmStringUtils
         return oss.str();
     }
 
+    /// @brief Parses a formatted string into a std::tm value using the given strftime format.
     inline std::tm from_string(const std::string &value, const char *format = "%Y-%m-%d %H:%M:%S")
     {
         std::tm tm = {};
