@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 
+/// @brief Factory functions that construct typed HTTP responses with appropriate status codes.
 namespace HttpResponses
 {
     crow::response invalid_json();

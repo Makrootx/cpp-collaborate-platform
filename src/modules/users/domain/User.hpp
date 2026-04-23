@@ -1,11 +1,12 @@
 #pragma once
 #include "shared/domain/BaseDomain.hpp"
+#include "modules/users/domain/IUserUse.hpp"
 #include <string>
 
 /**
  * @brief User aggregate with credential management rules.
  */
-class User : public BaseDomain
+class User : public BaseDomain, public IUserUse
 {
 protected:
     std::string password;
@@ -33,11 +34,15 @@ public:
     User &operator=(User &&) noexcept = default;
     User &operator=(const User &) = default;
     ~User() = default;
+    User to_domain() override
+    {
+        return *this;
+    }
 
-    void set_email(std::string email) { this->email = std::move(email); };
-    std::string get_email() const { return email; };
-    void set_password(std::string password) { this->password = this->hash_password(std::move(password)); };
-    const std::string &get_password() const { return password; }
+    void set_email(std::string email) override { this->email = std::move(email); };
+    std::string get_email() const override { return email; };
+    void set_password(std::string password) override { this->password = this->hash_password(std::move(password)); };
+    const std::string &get_password() const override { return password; }
     /** @brief Verifies input password against stored hash. */
     bool verify_password(const std::string &password) const;
 };

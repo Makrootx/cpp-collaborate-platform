@@ -83,7 +83,7 @@ void SpaceService::delete_space_by_id(long int id)
 
 void SpaceService::add_space_members(long int space_id, std::vector<long int> user_ids)
 {
-    auto space_opt = repo_->find_by_id(space_id);
+    auto space_opt = repo_->find_by_id_query(space_id, {"members"});
     if (!space_opt.has_value())
     {
         spdlog::error("Failed to add members to space: space with id {} not found", space_id);
@@ -105,7 +105,7 @@ void SpaceService::add_space_members(long int space_id, std::vector<long int> us
 
 void SpaceService::remove_space_members(long int space_id, std::vector<long int> user_ids)
 {
-    auto space_opt = repo_->find_by_id(space_id);
+    auto space_opt = repo_->find_by_id_query(space_id, {"members"});
     if (!space_opt.has_value())
     {
         spdlog::error("Failed to remove members from space: space with id {} not found", space_id);

@@ -1,8 +1,8 @@
 #pragma once
 
-// #include "shared/adapters/JwtAuthenticatorService.hpp"
 #include "modules/spaces/ports/ISpaceRepo.hpp"
 #include "shared/adapters/JwtGuard.hpp"
+#include "shared/adapters/http/response/HttpResponses.hpp"
 
 #include "crow.h"
 #include <utility>
@@ -19,7 +19,9 @@ struct SpaceMiddleware : public crow::ILocalMiddleware
     /** @brief Request-scoped authorization context for space access checks. */
     struct context
     {
-        std::optional<std::string> user_id;
+        long int admin_id;
+        long int user_id;
+        long int space_id;
     };
 
     SpaceMiddleware() = default;
@@ -29,42 +31,12 @@ struct SpaceMiddleware : public crow::ILocalMiddleware
     template <typename AllContext>
     void before_handle(crow::request &req,
                        crow::response &res,
-                       context &ctx, AllContext &all_ctx)
-    {
-        const JwtMiddleware::context &jwtCtx = all_ctx.template get<JwtMiddleware>();
-
-        const char *spaceIdRaw = req.url_params.get("space_id");
-        if (spaceIdRaw == nullptr)
-        {
-            res.code = 400;
-            res.end();
-            return;
-        }
-
-        std::string spaceIdValue(spaceIdRaw);
-
-        long int spaceId = std::stol(spaceIdValue);
-        const auto space = space_repo_->find_by_id_query(spaceId, {"members"});
-        if (!space.has_value())
-        {
-            res.code = 404;
-            res.end();
-            return;
-        }
-        if (space->user_has_access(jwtCtx.user_id.has_value() ? std::stol(jwtCtx.user_id.value()) : -1))
-        {
-            ctx.user_id = jwtCtx.user_id;
-        }
-        else
-        {
-            res.code = 403;
-            res.end();
-            return;
-        }
-    }
+                       context &ctx, AllContext &all_ctx);
 
     void after_handle(crow::request &, crow::response &, context &) {}
 
 protected:
     std::shared_ptr<ISpaceRepo> space_repo_;
 };
+
+#include "SpaceGuard.tpp"

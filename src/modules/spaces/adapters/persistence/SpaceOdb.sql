@@ -26,12 +26,12 @@ CREATE INDEX "space_members_space_id_i"
 ALTER TABLE "spaces"
   ADD CONSTRAINT "owner_id_fk"
     FOREIGN KEY ("owner_id")
-    REFERENCES "users" ("id")
+    REFERENCES "public"."users" ("id")
     INITIALLY DEFERRED;
 
 ALTER TABLE "space_members"
   ADD CONSTRAINT "user_id_fk"
     FOREIGN KEY ("user_id")
-    REFERENCES "users" ("id")
+    REFERENCES "public"."users" ("id")
     INITIALLY DEFERRED;
 

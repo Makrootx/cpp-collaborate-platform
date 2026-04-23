@@ -11,6 +11,8 @@ services:
       DB_HOST: backend-db
       DB_PORT: 5432
       POSTGRES_PORT: 5432
+      HTTP_HOST: 0.0.0.0
+      HTTP_PORT: 8080
       JWT_SECRET_KEY: ${JWT_SECRET_KEY}
       LOG_LEVEL: ${LOG_LEVEL}
       LOG_FILE: ${LOG_FILE}
@@ -30,7 +32,7 @@ services:
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: ${DB_NAME}
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      test: [ "CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}" ]
       interval: 10s
       timeout: 5s
       retries: 5

@@ -90,7 +90,6 @@ namespace Logger
         const auto level = parse_log_level(log_level.c_str());
         logger->set_level(level);
 
-        // Keep async mode, but flush aggressively to reduce data loss on abrupt termination.
         logger->flush_on(spdlog::level::trace);
 
         spdlog::set_default_logger(logger);

@@ -64,7 +64,7 @@ std::tuple<bool, std::vector<std::string>> JsonDto<Dto>::validate(const crow::js
 
         const auto &val = json[desc.key];
 
-        if (val.t() != desc.expected_type)
+        if (!json_type_matches(val.t(), desc.expected_types))
         {
             valid = false;
             errors.push_back("Invalid type for field: " + std::string(desc.key));
@@ -146,24 +146,50 @@ JsonDto<Dto>::FieldBuilder JsonDto<Dto>::field(const char *key, T Dto::*member)
 {
     return {.descriptor = {
                 .key = key,
-                .expected_type = JsonTypeHelper<T>::type,
+                .expected_types = JsonTypeHelper<T>::types,
                 .required = true,
                 .assign_func = [member](Dto &dto, const crow::json::rvalue &val)
                 { dto.*member = JsonTypeHelper<T>::read(val); },
-                .serialize_func = [key, member](const Dto &dto, crow::json::wvalue &out) // Added 'key' to capture
+                .serialize_func = [key, member](const Dto &dto, crow::json::wvalue &out)
                 { out[key] = JsonTypeHelper<T>::write(dto.*member); }}};
+}
+
+template <typename Dto>
+template <HasJsonTypeHelper T>
+JsonDto<Dto>::FieldBuilder JsonDto<Dto>::field_secured(const char *key, std::optional<T> Dto::*member)
+{
+    FieldBuilder result{.descriptor = {
+                            .key = key,
+                            .expected_types = JsonTypeHelper<T>::types,
+                            .required = true,
+                            .assign_func = [member](Dto &dto, const crow::json::rvalue &val)
+                            { dto.*member = JsonTypeHelper<T>::read(val); },
+                            .serialize_func = [key, member](const Dto &dto, crow::json::wvalue &out)
+                            { out[key] = JsonTypeHelper<T>::write(*(dto.*member)); }}};
+    result.with_secure_serializer(member);
+    return result;
 }
 
 template <typename Dto>
 template <HasJsonTypeHelper T>
 JsonDto<Dto>::FieldBuilder JsonDto<Dto>::optional_field(const char *key, std::optional<T> Dto::*member)
 {
+    static thread_local std::vector<crow::json::type> optional_types;
+    optional_types.clear();
+    for (auto t : JsonTypeHelper<T>::types)
+        optional_types.push_back(t);
+    optional_types.push_back(crow::json::type::Null);
+
     return {.descriptor = {
                 .key = key,
-                .expected_type = JsonTypeHelper<T>::type,
+                .expected_types = optional_types,
                 .required = false,
                 .assign_func = [member](Dto &dto, const crow::json::rvalue &val)
-                { dto.*member = JsonTypeHelper<T>::read(val); },
+                { 
+                    if (val.t() == crow::json::type::Null)
+                        dto.*member = std::nullopt;
+                    else
+                        dto.*member = JsonTypeHelper<T>::read(val); },
                 .serialize_func = [key, member](const Dto &dto, crow::json::wvalue &out)
                 {
                         if ((dto.*member).has_value()) {
@@ -172,12 +198,41 @@ JsonDto<Dto>::FieldBuilder JsonDto<Dto>::optional_field(const char *key, std::op
 }
 
 template <typename Dto>
+template <HasJsonTypeHelper T>
+JsonDto<Dto>::FieldBuilder JsonDto<Dto>::optional_field_secured(const char *key, std::optional<std::optional<T>> Dto::*member)
+{
+    static thread_local std::vector<crow::json::type> optional_types;
+    optional_types.clear();
+    for (auto t : JsonTypeHelper<T>::types)
+        optional_types.push_back(t);
+    optional_types.push_back(crow::json::type::Null);
+
+    FieldBuilder result{.descriptor = {
+                            .key = key,
+                            .expected_types = optional_types,
+                            .required = false,
+                            .assign_func = [member](Dto &dto, const crow::json::rvalue &val)
+                            { 
+                    if (val.t() == crow::json::type::Null)
+                        dto.*member = std::nullopt;
+                    else
+                        dto.*member = std::optional<std::optional<T>>(JsonTypeHelper<T>::read(val)); },
+                            .serialize_func = [key, member](const Dto &dto, crow::json::wvalue &out)
+                            {
+                    if ((dto.*member).has_value() && (dto.*member).value().has_value()) {
+                        out[key] = JsonTypeHelper<T>::write(**(dto.*member));
+                    } }}};
+    result.with_secure_serializer(member);
+    return result;
+}
+
+template <typename Dto>
 template <NestedDto Nested>
 JsonDto<Dto>::FieldBuilder JsonDto<Dto>::nested_field(const char *key, Nested Dto::*member)
 {
     return {.descriptor = {
                 .key = key,
-                .expected_type = JsonTypeHelper<Nested>::type,
+                .expected_types = JsonTypeHelper<Nested>::types,
                 .required = true,
                 .assign_func = [member](Dto &dto, const crow::json::rvalue &val)
                 { dto.*member = JsonTypeHelper<Nested>::read(val); },
@@ -190,14 +245,43 @@ JsonDto<Dto>::FieldBuilder JsonDto<Dto>::nested_field(const char *key, Nested Dt
 
 template <typename Dto>
 template <NestedDto Nested>
+JsonDto<Dto>::FieldBuilder JsonDto<Dto>::nested_field_secured(const char *key, std::optional<Nested> Dto::*member)
+{
+    FieldBuilder result{.descriptor = {
+                            .key = key,
+                            .expected_types = JsonTypeHelper<Nested>::types,
+                            .required = true,
+                            .assign_func = [member](Dto &dto, const crow::json::rvalue &val)
+                            { dto.*member = JsonTypeHelper<Nested>::read(val); },
+                            .serialize_func = [key, member](const Dto &d, crow::json::wvalue &out)
+                            { out[key] = JsonTypeHelper<Nested>::write(d.*member); },
+                            .constraints = {},
+                            .nested_validator = [](const crow::json::rvalue &val)
+                            { return validate_nested<Nested>(val); }}};
+    result.with_secure_serializer(member);
+    return result;
+}
+
+template <typename Dto>
+template <NestedDto Nested>
 JsonDto<Dto>::FieldBuilder JsonDto<Dto>::optional_nested_field(const char *key, std::optional<Nested> Dto::*member)
 {
+    static thread_local std::vector<crow::json::type> optional_types;
+    optional_types.clear();
+    for (auto t : JsonTypeHelper<Nested>::types)
+        optional_types.push_back(t);
+    optional_types.push_back(crow::json::type::Null);
+
     return {.descriptor = {
                 .key = key,
-                .expected_type = JsonTypeHelper<Nested>::type,
+                .expected_types = optional_types,
                 .required = false,
                 .assign_func = [member](Dto &dto, const crow::json::rvalue &val)
-                { dto.*member = JsonTypeHelper<Nested>::read(val); },
+                { 
+                    if (val.t() == crow::json::type::Null)
+                        dto.*member = std::nullopt;
+                    else
+                        dto.*member = JsonTypeHelper<Nested>::read(val); },
                 .serialize_func = [key, member](const Dto &d, crow::json::wvalue &out)
                 {
                     if ((d.*member).has_value()) {
@@ -205,5 +289,44 @@ JsonDto<Dto>::FieldBuilder JsonDto<Dto>::optional_nested_field(const char *key, 
                     } },
                 .constraints = {},
                 .nested_validator = [](const crow::json::rvalue &val)
-                { return validate_nested<Nested>(val); }}};
+                { 
+                    if (val.t() == crow::json::type::Null)
+                        return std::make_tuple(true, std::vector<std::string>{});
+                    return validate_nested<Nested>(val); }}};
+}
+
+template <typename Dto>
+template <NestedDto Nested>
+JsonDto<Dto>::FieldBuilder JsonDto<Dto>::optional_nested_field_secured(const char *key, std::optional<std::optional<Nested>> Dto::*member)
+{
+
+    static thread_local std::vector<crow::json::type> optional_types;
+    optional_types.clear();
+    for (auto t : JsonTypeHelper<Nested>::types)
+        optional_types.push_back(t);
+    optional_types.push_back(crow::json::type::Null);
+
+    FieldBuilder result{.descriptor = {
+                            .key = key,
+                            .expected_types = optional_types,
+                            .required = false,
+                            .assign_func = [member](Dto &dto, const crow::json::rvalue &val)
+                            { 
+                    if (val.t() == crow::json::type::Null)
+                        dto.*member = std::nullopt;
+                    else
+                        dto.*member = std::optional<std::optional<Nested>>(JsonTypeHelper<Nested>::read(val)); },
+                            .serialize_func = [key, member](const Dto &d, crow::json::wvalue &out)
+                            {
+                    if ((d.*member).has_value() && (d.*member).value().has_value()) {
+                        out[key] = JsonTypeHelper<Nested>::write(**(d.*member));
+                    } },
+                            .constraints = {},
+                            .nested_validator = [](const crow::json::rvalue &val)
+                            { 
+                    if (val.t() == crow::json::type::Null)
+                        return std::make_tuple(true, std::vector<std::string>{});
+                    return validate_nested<Nested>(val); }}};
+    result.with_secure_serializer(member);
+    return result;
 }

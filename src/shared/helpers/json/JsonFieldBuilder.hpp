@@ -3,11 +3,13 @@
 #include "crow.h"
 
 #include <functional>
+#include <span>
 #include <string>
 #include <tuple>
 #include <utility>
 #include <vector>
 
+/// @brief Describes a single field mapping between a JSON key and a Dto member, including type info, constraints, and serialization functions.
 template <typename Dto>
 struct JsonFieldDescriptor
 {
@@ -16,7 +18,7 @@ struct JsonFieldDescriptor
     using JsonAssignFunc = std::function<void(Dto &, const crow::json::rvalue &)>;
 
     const char *key;
-    crow::json::type expected_type;
+    std::span<const crow::json::type> expected_types;
     bool required = true;
     JsonAssignFunc assign_func;
     JsonSerializationFunc serialize_func;
@@ -24,6 +26,7 @@ struct JsonFieldDescriptor
     std::function<std::tuple<bool, std::vector<std::string>>(const crow::json::rvalue &)> nested_validator = nullptr;
 };
 
+/// @brief Fluent builder for constructing a JsonFieldDescriptor with optional validation constraints and secure serialization.
 template <typename Dto>
 struct JsonFieldBuilder
 {
@@ -31,11 +34,15 @@ public:
     using JsonConstraintFunc = typename JsonFieldDescriptor<Dto>::JsonConstraintFunc;
     JsonFieldDescriptor<Dto> descriptor;
 
+    /// @brief Attaches an additional validation constraint with an error message to the field descriptor.
     JsonFieldBuilder &with(JsonConstraintFunc constraint, const std::string &error_message)
     {
         descriptor.constraints.emplace_back(constraint, error_message);
         return *this;
     }
+
+    template <typename OptionalMember>
+    JsonFieldBuilder &with_secure_serializer(OptionalMember Dto::*member);
 
     JsonFieldDescriptor<Dto> build()
     {
@@ -47,3 +54,5 @@ public:
         return build();
     }
 };
+
+#include "JsonFieldBuilder.tpp"

@@ -6,7 +6,7 @@
 #include <odb/core.hxx>
 #include <memory>
 
-#pragma db object table("users") pointer(std::shared_ptr)
+#pragma db object table("users") schema("public") pointer(std::shared_ptr)
 /**
  * @brief ODB persistence model for users table.
  *

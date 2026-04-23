@@ -48,6 +48,9 @@ if ($env:ODB_ROOT) {
 if ($env:ODB_PGSQL_ROOT) {
     $includeArgs += @('-I', (Join-Path $env:ODB_PGSQL_ROOT 'include'))
 }
+if ($env:ODB_BOOST_ROOT) {
+    $includeArgs += @('-I', (Join-Path $env:ODB_BOOST_ROOT 'include'))
+}
 
 $vcpkgBuildInclude = Join-Path $ProjectRoot 'build_dev/vcpkg_installed/x64-windows/include'
 if (Test-Path $vcpkgBuildInclude) {
@@ -57,6 +60,26 @@ if (Test-Path $vcpkgBuildInclude) {
 $vcpkgRootInclude = Join-Path $ProjectRoot 'vcpkg_installed/x64-windows/include'
 if (Test-Path $vcpkgRootInclude) {
     $includeArgs += @('-I', $vcpkgRootInclude)
+}
+
+$odbBoostDateTimeOptions = $null
+if ($env:ODB_BOOST_ROOT) {
+    $candidate = Join-Path $env:ODB_BOOST_ROOT 'include/odb/boost/date-time.options'
+    if (Test-Path $candidate) {
+        $odbBoostDateTimeOptions = $candidate
+    }
+}
+if (-not $odbBoostDateTimeOptions -and (Test-Path $vcpkgBuildInclude)) {
+    $candidate = Join-Path $vcpkgBuildInclude 'odb/boost/date-time.options'
+    if (Test-Path $candidate) {
+        $odbBoostDateTimeOptions = $candidate
+    }
+}
+if (-not $odbBoostDateTimeOptions -and (Test-Path $vcpkgRootInclude)) {
+    $candidate = Join-Path $vcpkgRootInclude 'odb/boost/date-time.options'
+    if (Test-Path $candidate) {
+        $odbBoostDateTimeOptions = $candidate
+    }
 }
 
 $entityHeaders = Get-ChildItem -Path $SrcDir -Recurse -File -Include '*.hpp', '*.h' |
@@ -76,12 +99,28 @@ foreach ($header in $entityHeaders) {
         '-d', 'pgsql'
         '--std', 'c++20'
         '--generate-query'
+        '--pgsql-server-version', '9.4'
         '--generate-schema'
         '--generate-session'
         $includeArgs
         '--output-dir', $outDir
         $header.FullName
     )
+
+    if ($odbBoostDateTimeOptions) {
+        $arguments = @(
+            '-d', 'pgsql'
+            '--std', 'c++20'
+            '--options-file', $odbBoostDateTimeOptions
+            '--generate-query'
+            '--pgsql-server-version', '9.4'
+            '--generate-schema'
+            '--generate-session'
+            $includeArgs
+            '--output-dir', $outDir
+            $header.FullName
+        )
+    }
 
     Write-Host "Generating ODB files for $($header.FullName)"
     & $odbExe @arguments
