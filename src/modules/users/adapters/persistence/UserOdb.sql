@@ -2,9 +2,9 @@
  * compiler for C++.
  */
 
-DROP TABLE IF EXISTS "users" CASCADE;
+DROP TABLE IF EXISTS "public"."users" CASCADE;
 
-CREATE TABLE "users" (
+CREATE TABLE "public"."users" (
   "id" BIGSERIAL NOT NULL PRIMARY KEY,
   "email" VARCHAR(255) NOT NULL,
   "password" VARCHAR(255) NOT NULL);
