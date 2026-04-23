@@ -11,6 +11,7 @@
 
 using LiteralValue = std::variant<int, std::string, bool>;
 
+/// @brief Bidirectional string conversion utilities for all automation-related enum types.
 namespace AutomationParseUtils
 {
     template <typename T>
@@ -202,6 +203,7 @@ namespace AutomationParseUtils
     {
     };
 
+    /// @brief Satisfied when T is a known automation enum with registered to_string/from_string conversions.
     template <typename T>
     concept AutomationEnumParsable =
         IsAutomationEnum<T>::value &&

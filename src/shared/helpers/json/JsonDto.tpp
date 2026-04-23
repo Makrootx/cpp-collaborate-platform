@@ -150,7 +150,7 @@ JsonDto<Dto>::FieldBuilder JsonDto<Dto>::field(const char *key, T Dto::*member)
                 .required = true,
                 .assign_func = [member](Dto &dto, const crow::json::rvalue &val)
                 { dto.*member = JsonTypeHelper<T>::read(val); },
-                .serialize_func = [key, member](const Dto &dto, crow::json::wvalue &out) // Added 'key' to capture
+                .serialize_func = [key, member](const Dto &dto, crow::json::wvalue &out)
                 { out[key] = JsonTypeHelper<T>::write(dto.*member); }}};
 }
 

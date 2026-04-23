@@ -7,6 +7,7 @@
 
 namespace HttpRequestParams
 {
+    /// @brief Parses a comma-separated query parameter into a vector of trimmed string tokens.
     inline std::vector<std::string> parse_csv_param(const crow::request &req, const char *param_name)
     {
         std::vector<std::string> result;

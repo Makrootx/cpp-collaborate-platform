@@ -35,6 +35,14 @@ namespace PermissionCore
             {
                 perm.entities[entity_name] = PermissionCore::populate_missing<EntitySchemas::EntityAccessor::UserSchema>(perm.entities[entity_name]);
             }
+            else if (std::string_view(entity_name) == EntitySchemas::EntityAccessor::BOARDS)
+            {
+                perm.entities[entity_name] = PermissionCore::populate_missing<EntitySchemas::EntityAccessor::BoardSchema>(perm.entities[entity_name]);
+            }
+            else if (std::string_view(entity_name) == EntitySchemas::EntityAccessor::BOARD_CATEGORIES)
+            {
+                perm.entities[entity_name] = PermissionCore::populate_missing<EntitySchemas::EntityAccessor::BoardCategorySchema>(perm.entities[entity_name]);
+            }
         }
         return perm;
     }

@@ -9,7 +9,6 @@
 #include <odb/pgsql/connection-factory.hxx>
 
 #include <map>
-// #include "shared/helpers/env_keys.hpp"
 #include "shared/helpers/EnvProvider.hpp"
 
 DatabaseManager::DatabaseEnvConfig DatabaseManager::getenv_config()

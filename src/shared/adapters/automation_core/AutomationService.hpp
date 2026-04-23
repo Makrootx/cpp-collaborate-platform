@@ -8,6 +8,7 @@
 
 #include "shared/adapters/automation_core/AutomationRuntimeStructs.hpp"
 
+/// @brief Singleton service that registers, stores, and executes automation rules per space.
 class AutomationService
 {
 private:
@@ -51,10 +52,15 @@ public:
         return instance;
     }
 
+    /// @brief Indexes and stores an automation config for the given space, replacing any prior registration.
     void register_space(long int space_id, AutomationConfig config);
+    /// @brief Removes all automation rules registered for the given space.
     void unregister_space(long int space_id);
+    /// @brief Returns true when the given space has at least one registered automation.
     bool has_space(long space_id) const;
+    /// @brief Evaluates and fires all matching automation rules for the domain actions recorded in domain_automation.
     void execute_automations(long int space_id, const DomainAtomAutomation &domain_automation);
 
+    /// @brief Captures the current LiteralValue for every automatable field of target as a before-snapshot.
     static std::unordered_map<std::string, std::optional<LiteralValue>> snapshot(IAutomatable &target);
 };

@@ -14,6 +14,7 @@
 
 template <typename Dto>
 class JsonDto;
+/// @brief Satisfied when T is a concrete type derived from JsonDto<T>.
 template <typename T>
 concept JsonDtoDerived = std::is_base_of_v<JsonDto<T>, T>;
 
@@ -28,6 +29,7 @@ inline bool json_type_matches(crow::json::type actual, const crow::json::type (&
     return json_type_matches(actual, std::span<const crow::json::type>(expected));
 }
 
+/// @brief Satisfied when T has a specialised JsonTypeHelper providing JSON type list, read, and write.
 template <typename T>
 concept HasJsonTypeHelper = requires(const crow::json::rvalue &rv, const T &value) {
     { json_type_matches(rv.t(), JsonTypeHelper<T>::types) } -> std::convertible_to<bool>;

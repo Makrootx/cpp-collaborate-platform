@@ -39,6 +39,7 @@ concept HasDtoFields = requires {
     { Dto::fields() } -> std::ranges::input_range;
 } && std::convertible_to<std::ranges::range_value_t<decltype(Dto::fields())>, JsonFieldDescriptor<Dto>>;
 
+/// @brief CRTP base providing JSON serialization, deserialization, and validation for data transfer objects.
 template <typename Dto>
 class JsonDto
 {
@@ -46,16 +47,19 @@ public:
     using FieldDescriptor = JsonFieldDescriptor<Dto>;
     using FieldBuilder = JsonFieldBuilder<Dto>;
 
+    /// @brief Deserializes JSON into an optional Dto; returns nullopt when validation fails.
     static std::optional<Dto>
     from_json(const crow::json::rvalue &json)
         requires HasDtoFields<Dto>;
 
+    /// @brief Serializes a Dto to a JSON write-value using declared field descriptors.
     static crow::json::wvalue to_json(const Dto &dto)
         requires HasDtoFields<Dto>;
 
     crow::json::wvalue to_json() const
         requires HasDtoFields<Dto>;
 
+    /// @brief Validates a JSON value against the Dto's field descriptors; returns validity flag and collected error messages.
     static std::tuple<bool, std::vector<std::string>> validate(const crow::json::rvalue &json)
         requires HasDtoFields<Dto>;
 

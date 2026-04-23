@@ -11,6 +11,7 @@
 
 #include <concepts>
 
+/// @brief Satisfied when Odb exposes an id_value() member that converts to unsigned long.
 template <typename Odb>
 concept OdbBase = requires(Odb odb) {
     { odb.id_value() } -> std::convertible_to<unsigned long>;
@@ -29,12 +30,14 @@ class PgBaseRepo : public virtual IBaseRepo<Domain>
 protected:
     std::string context_ = "public";
 
+    /// @brief Sets the PostgreSQL search_path to the stored schema context before executing ODB operations.
     void execute_context_query()
     {
         std::string context_query = "SET search_path TO " + context_ + ", public";
         db_->execute(context_query);
     }
 
+    /// @brief Sets the PostgreSQL search_path to the given schema context.
     void execute_context_query(std::string context)
     {
         std::string context_query = "SET search_path TO " + context + ", public";

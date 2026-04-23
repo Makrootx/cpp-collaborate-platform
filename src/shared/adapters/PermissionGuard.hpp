@@ -1,6 +1,5 @@
 #pragma once
 
-// #include "shared/adapters/JwtAuthenticatorService.hpp"
 #include "modules/groups/ports/IGroupRepo.hpp"
 #include "modules/groups/adapters/GroupModule.hpp"
 #include "shared/adapters/SpaceGuard.hpp"
@@ -11,6 +10,7 @@
 #include <memory>
 #include <numeric>
 
+/// @brief Middleware that resolves and aggregates the effective GroupPermission for the requesting user.
 struct PermissionMiddleware : public crow::ILocalMiddleware
 {
 protected:
