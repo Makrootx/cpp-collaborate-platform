@@ -1,6 +1,7 @@
 param(
     [string]$CoreUrl = "https://www.codesynthesis.com/download/odb/2.5.0/windows/windows10/x86_64/libodb-2.5.0-x86_64-windows10-msvc17.10.zip",
     [string]$PgUrl   = "https://www.codesynthesis.com/download/odb/2.5.0/windows/windows10/x86_64/libodb-pgsql-2.5.0-x86_64-windows10-msvc17.10.zip",
+    [string]$BoostUrl = "https://www.codesynthesis.com/download/odb/2.5.0/windows/windows10/x86_64/libodb-boost-2.5.0-x86_64-windows10-msvc17.10.zip",
     [string]$CompilerUrl = "https://www.codesynthesis.com/download/odb/2.5.0/windows/windows10/x86_64/odb-2.5.0-x86_64-windows10.zip",
     [string]$CompilerLinkPath = "C:\odb-2.5.0"
 )
@@ -36,6 +37,7 @@ function Fetch-UnpackZip {
 
 $CoreDir = Fetch-UnpackZip -Url $CoreUrl
 $PgDir   = Fetch-UnpackZip -Url $PgUrl
+$BoostDir = Fetch-UnpackZip -Url $BoostUrl
 $CompilerDir = Fetch-UnpackZip -Url $CompilerUrl
 
 $CompilerRoot = $CompilerDir
@@ -63,6 +65,7 @@ $envFile = Join-Path $Deps 'odb_env.ps1'
 $envLines = @(
     "`$env:ODB_ROOT='$CoreDir'",
     "`$env:ODB_PGSQL_ROOT='$PgDir'",
+    "`$env:ODB_BOOST_ROOT='$BoostDir'",
     "`$env:ODB_ROOT_MAIN='${CompilerRoot}/bin'"
 )
 if (Test-Path $CompilerExe) {
@@ -72,6 +75,7 @@ $envLines | Out-File $envFile -Encoding ascii
 
 Write-Host "ODB_ROOT=$CoreDir"
 Write-Host "ODB_PGSQL_ROOT=$PgDir"
+Write-Host "ODB_BOOST_ROOT=$BoostDir"
 Write-Host "ODB_ROOT_MAIN=$CompilerRoot/bin"
 if (Test-Path $CompilerExe) {
     Write-Host "ODB_COMPILER=$CompilerExe"
