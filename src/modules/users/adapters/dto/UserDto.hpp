@@ -92,6 +92,15 @@ public:
         return f;
     };
 
+    UserResultSecureDto merge_with_plain(const UserResultDto &plain)
+    {
+        if (id.has_value())
+            id = plain.id;
+        if (email.has_value())
+            email = plain.email;
+        return *this;
+    }
+
     static UserResultSecureDto from_domain(const IUserSecureUse &user)
     {
         return UserResultSecureDto{.id = user.get_id(), .email = user.get_email()};
