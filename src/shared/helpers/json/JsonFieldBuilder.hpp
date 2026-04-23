@@ -3,6 +3,7 @@
 #include "crow.h"
 
 #include <functional>
+#include <span>
 #include <string>
 #include <tuple>
 #include <utility>
@@ -16,7 +17,7 @@ struct JsonFieldDescriptor
     using JsonAssignFunc = std::function<void(Dto &, const crow::json::rvalue &)>;
 
     const char *key;
-    crow::json::type expected_type;
+    std::span<const crow::json::type> expected_types;
     bool required = true;
     JsonAssignFunc assign_func;
     JsonSerializationFunc serialize_func;
@@ -37,6 +38,9 @@ public:
         return *this;
     }
 
+    template <typename OptionalMember>
+    JsonFieldBuilder &with_secure_serializer(OptionalMember Dto::*member);
+
     JsonFieldDescriptor<Dto> build()
     {
         return descriptor;
@@ -47,3 +51,5 @@ public:
         return build();
     }
 };
+
+#include "JsonFieldBuilder.tpp"
