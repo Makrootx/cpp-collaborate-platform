@@ -7,10 +7,25 @@
 #include "modules/users/adapters/UserService.hpp"
 #include "modules/users/adapters/persistence/PgUserRepo.hpp"
 #include "shared/adapters/JwtGuard.hpp"
+#include "shared/adapters/PermissionGuard.hpp"
 #include "shared/adapters/Logger.hpp"
 #include "shared/adapters/SpaceGuard.hpp"
+#include "modules/tasks/adapters/TaskRouteHandler.hpp"
+#include "modules/groups/adapters/GroupRouteHandler.hpp"
+
+#include "modules/automation/adapters/AutomationStaticService.hpp"
+#include "modules/automation/adapters/persistance/AutomationDomainOdb.hpp"
+
+#include "modules/groups/adapters/GroupModule.hpp"
+#include "modules/automation/adapters/AutomationModule.hpp"
+#include "modules/automation/adapters/AutomationRouteHandler.hpp"
+#include "modules/boards/adapters/BoardModule.hpp"
+#include "modules/boards/adapters/BoardRouteHandler.hpp"
+#include "modules/boardCategories/adapters/BoardCategoryModule.hpp"
+#include "modules/boardCategories/adapters/BoardCategoryRouteHandler.hpp"
 
 #include <exception>
+#include <string>
 #include <spdlog/spdlog.h>
 #include "shared/helpers/EnvProvider.hpp"
 
@@ -55,15 +70,43 @@ int main()
 
     auto spaceRepo = std::make_shared<PgSpaceRepo<SpaceOdb>>(db);
     auto spaceService = std::make_shared<SpaceService>(spaceRepo, userRepo);
-    crow::App<JwtMiddleware, SpaceMiddleware> app{JwtMiddleware(), SpaceMiddleware(spaceRepo)};
+
+    auto groupModule = std::make_shared<GroupModule>(db, spaceRepo);
+    auto taskModule = std::make_shared<TaskModule>(db, spaceRepo);
+    auto automationModule = std::make_shared<AutomationModule>(db);
+
+    auto automationRepo = std::make_shared<PgAutomationRepo<AutomationDomainOdb>>(db);
+
+    AutomationStaticService::initialize(automationRepo);
+
+    crow::App<JwtMiddleware, SpaceMiddleware, PermissionMiddleware> app{JwtMiddleware(), SpaceMiddleware(spaceRepo), PermissionMiddleware(groupModule)};
 
     UserRouteHandler userRouteHandler(userService);
     SpaceRouteHandler spaceRouteHandler(spaceService);
-
+    TaskRouteHandler taskRouteHandler(taskModule);
+    GroupRouteHandler groupRouteHandler(groupModule);
+    AutomationRouteHandler automationRouteHandler(automationModule);
+    auto boardModule = std::make_shared<BoardModule>(db);
+    auto boardCategoryModule = std::make_shared<BoardCategoryModule>(db);
+    BoardRouteHandler boardRouteHandler(boardModule);
+    BoardCategoryRouteHandler boardCategoryRouteHandler(boardCategoryModule);
     userRouteHandler.setup(app);
     spaceRouteHandler.setup(app);
+    taskRouteHandler.setup(app);
+    groupRouteHandler.setup(app);
+    automationRouteHandler.setup(app);
+    boardRouteHandler.setup(app);
+    boardCategoryRouteHandler.setup(app);
 
-    app.port(8080)
+    const std::string http_host = EnvProvider::get(Env::HTTP_HOST);
+    const std::string http_port = EnvProvider::get(Env::HTTP_PORT);
+
+    spdlog::info("Starting HTTP server on {}:{}", http_host, http_port);
+
+    const auto parsed_port = static_cast<std::uint16_t>(std::stoi(http_port));
+
+    app.bindaddr(http_host)
+        .port(parsed_port)
         .multithreaded()
         .run();
 }
