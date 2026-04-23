@@ -618,7 +618,7 @@ namespace odb
   "\"spaces\".\"description\",\n"
   "\"spaces\".\"owner_id\"\n"
   "FROM \"spaces\"\n"
-  "LEFT JOIN \"users\" AS \"owner_id\" ON \"owner_id\".\"id\"=\"spaces\".\"owner_id\"";
+  "LEFT JOIN \"public\".\"users\" AS \"owner_id\" ON \"owner_id\".\"id\"=\"spaces\".\"owner_id\"";
 
   const char access::object_traits_impl< ::SpaceOdb, id_pgsql >::erase_query_statement[] =
   "DELETE FROM \"spaces\"";

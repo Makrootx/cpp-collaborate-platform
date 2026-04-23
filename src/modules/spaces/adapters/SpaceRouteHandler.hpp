@@ -4,6 +4,7 @@
 #include "modules/spaces/ports/ISpaceService.hpp"
 #include "shared/adapters/JwtGuard.hpp"
 #include "shared/adapters/SpaceGuard.hpp"
+#include "shared/adapters/PermissionGuard.hpp"
 
 #include <memory>
 
@@ -20,5 +21,5 @@ public:
     }
 
     /** @brief Binds all space routes and middleware-aware handlers to app. */
-    void setup(crow::App<JwtMiddleware, SpaceMiddleware> &app);
+    void setup(crow::App<JwtMiddleware, SpaceMiddleware, PermissionMiddleware> &app);
 };

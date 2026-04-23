@@ -7,6 +7,17 @@
 #ifndef SPACE_ODB_ODB_HXX
 #define SPACE_ODB_ODB_HXX
 
+// Begin prologue.
+//
+#include <odb/boost/version.hxx>
+#if ODB_BOOST_VERSION != 2050000 // 2.5.0
+#  error ODB and C++ compilers see different libodb-boost interface versions
+#endif
+#include <odb/boost/date-time/pgsql/gregorian-traits.hxx>
+#include <odb/boost/date-time/pgsql/posix-time-traits.hxx>
+//
+// End prologue.
+
 #include <odb/version.hxx>
 
 #if ODB_VERSION != 20500UL
