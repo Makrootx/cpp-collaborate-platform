@@ -15,6 +15,9 @@ if (-not $env:ODB_ROOT) {
 if (-not $env:ODB_PGSQL_ROOT) {
 	$env:ODB_PGSQL_ROOT = "C:\odb-2.5.0-msvc\libodb-pgsql-2.5.0-x86_64-windows10-msvc17.10"
 }
+if (-not $env:ODB_BOOST_ROOT) {
+	$env:ODB_BOOST_ROOT = "C:\odb-2.5.0-msvc\libodb-boost-2.5.0-x86_64-windows10-msvc17.10"
+}
 if (-not $env:ODB_ROOT_MAIN) {
 	$env:ODB_ROOT_MAIN = "C:\odb-2.5.0\bin"
 }
@@ -37,6 +40,10 @@ if ($env:ODB_PGSQL_ROOT -and (Test-Path (Join-Path $env:ODB_PGSQL_ROOT 'bin'))) 
 	$pathParts.Add((Join-Path $env:ODB_PGSQL_ROOT 'bin'))
 }
 
+if ($env:ODB_BOOST_ROOT -and (Test-Path (Join-Path $env:ODB_BOOST_ROOT 'bin'))) {
+	$pathParts.Add((Join-Path $env:ODB_BOOST_ROOT 'bin'))
+}
+
 $pathParts.Add($env:PATH)
 $env:PATH = ($pathParts -join ';')
 
@@ -57,6 +64,7 @@ foreach ($candidate in $compilerCandidates) {
 Write-Host "VCPKG_ROOT=$env:VCPKG_ROOT"
 Write-Host "ODB_ROOT=$env:ODB_ROOT"
 Write-Host "ODB_PGSQL_ROOT=$env:ODB_PGSQL_ROOT"
+Write-Host "ODB_BOOST_ROOT=$env:ODB_BOOST_ROOT"
 if ($env:ODB_COMPILER) {
 	Write-Host "ODB_COMPILER=$env:ODB_COMPILER"
 } else {

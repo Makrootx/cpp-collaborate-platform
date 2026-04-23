@@ -19,7 +19,8 @@
         {
             "name": "dev",
             "configurePreset": "dev",
-            "configuration": "Release"
+            "configuration": "Release",
+            "jobs": 12
         }
     ]
 }
