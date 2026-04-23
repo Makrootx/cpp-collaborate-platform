@@ -36,7 +36,6 @@ public:
         domain->set_config(dto.config);
         repo_->update(domain.value());
 
-        // Re-register the updated config in the runtime engine
         AutomationService::instance().unregister_space(space_id_);
         AutomationService::instance().register_space(space_id_, dto.config);
     }
